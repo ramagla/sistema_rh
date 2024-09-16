@@ -236,10 +236,32 @@ def processar_zip_e_enviar_emails(zip_file_path, funcionarios):
 
             if os.path.exists(pdf_file_path):
                 assunto = f"Holerite de {nome_funcionario}"
-                corpo = f"Prezado {nome_funcionario},\n\nSegue em anexo o seu holerite."
+
+                # Corpo do e-mail em HTML personalizado
+                corpo_html = f"""
+                <html>
+                <body>
+                    <div style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+                        <h2 style="color: #6c757d;">Seu holerite está disponível</h2>
+                        <p>Olá, {nome_funcionario}!</p>
+                        <p>Seu holerite foi gerado com sucesso! Veja as informações abaixo:</p>
+                        <div style="border: 1px solid #dee2e6; padding: 15px; background-color: white;">
+                            <p><strong>Empregador:</strong> Bras-Mol Molas e Estampados Ltda</p>
+                            <p><strong>Colaborador:</strong> {nome_funcionario}</p>
+                            <p><strong>Data de Registro:</strong> {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+                        </div>
+                        <p>O holerite está anexo neste e-mail.</p>
+                        <p style="color: #6c757d;">Obrigado,</p>
+                        <p><strong>Bras-Mol Molas e Estampados Ltda</strong></p>
+                    </div>
+                </body>
+                </html>
+                """
                 
                 try:
-                    enviar_email_com_anexo(email_funcionario, assunto, corpo, pdf_file_path)
+                    # Enviar e-mail com anexo e corpo em HTML
+                    enviar_email_com_anexo(email_funcionario, assunto, corpo_html, pdf_file_path)
+                    
                     # Salvar sucesso no arquivo de texto
                     salvar_relatorio_txt(nome_funcionario, email_funcionario, True)
                     print(f"E-mail enviado para {email_funcionario} com o arquivo {pdf_file_path}")
@@ -251,8 +273,8 @@ def processar_zip_e_enviar_emails(zip_file_path, funcionarios):
                 print(f"Arquivo PDF não encontrado para {nome_funcionario}.")
     except Exception as e:
         print(f"Erro ao processar ZIP ou enviar e-mails: {e}")
-        raise    
-
+        raise
+  
 
 
 # Função para ler o arquivo Excel e retornar os dados como uma lista de dicionários

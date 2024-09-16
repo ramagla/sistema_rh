@@ -1,1 +1,11 @@
 2024-09-16 09:57:43 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Sucesso
+2024-09-16 10:05:51 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Sucesso
+2024-09-16 10:22:19 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Sucesso
+2024-09-16 10:24:12 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Erro: name 'MIMEApplication' is not defined
+2024-09-16 10:24:19 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Erro: name 'MIMEApplication' is not defined
+2024-09-16 10:25:05 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Erro: name 'MIMEApplication' is not defined
+2024-09-16 10:27:27 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Erro: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials 41be03b00d2f7-7db498d9850sm4132058a12.10 - gsmtp')
+2024-09-16 10:31:19 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Erro: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials d2e1a72fcca58-71944a980casm3676618b3a.28 - gsmtp')
+2024-09-16 10:31:57 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Sucesso
+2024-09-16 10:33:59 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Sucesso
+2024-09-16 10:41:09 | RAFAEL DE ALMEIDA SILVA | dealmeida.silva@hotmail.com | Sucesso

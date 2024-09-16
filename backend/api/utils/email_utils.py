@@ -5,21 +5,21 @@ from email.mime.base import MIMEBase
 from email import encoders
 import os
 
-# Detalhes do servidor de e-mail (altere para suas configurações)
+# Detalhes do servidor de e-mail
 EMAIL_HOST = 'smtp.brasmol.com.br'
 EMAIL_PORT = 587
 EMAIL_USER = 'rh@brasmol.com.br'
 EMAIL_PASSWORD = 'Brasmol@2024'
 
-def enviar_email_com_anexo(destinatario, assunto, corpo, anexo):
+def enviar_email_com_anexo(destinatario, assunto, corpo_html, anexo):
     try:
         msg = MIMEMultipart()
         msg['From'] = EMAIL_USER
         msg['To'] = destinatario
         msg['Subject'] = assunto
 
-        # Corpo do e-mail
-        msg.attach(MIMEText(corpo, 'plain'))
+        # Corpo do e-mail em HTML (essa linha é onde ocorre a mudança importante)
+        msg.attach(MIMEText(corpo_html, 'html'))  # Altera para 'html' em vez de 'plain'
 
         # Anexo
         with open(anexo, "rb") as attachment:
@@ -31,7 +31,7 @@ def enviar_email_com_anexo(destinatario, assunto, corpo, anexo):
 
         # Enviar e-mail
         server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)
-        server.starttls()
+        server.starttls()  # Usar TLS para criptografia
         server.login(EMAIL_USER, EMAIL_PASSWORD)
         text = msg.as_string()
         server.sendmail(EMAIL_USER, destinatario, text)
