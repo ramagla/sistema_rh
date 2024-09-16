@@ -473,4 +473,5 @@ if __name__ == '__main__':
         os.makedirs('../logs')  # Garante que a pasta de logs exista
     app.run(debug=True, host='0.0.0.0')
 
-
+if __name__ == '__main__':
+  app.arguments(debug=True)
