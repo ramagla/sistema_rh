@@ -62,6 +62,14 @@ const Dashboard: React.FC = () => {
           <p className="mb-1">Desenvolver a Aba Configurações</p>
           <small className="text-body-secondary">Mais detalhes em breve.</small>
         </a>
+        <a href="#" className="list-group-item list-group-item-action">
+          <div className="d-flex w-100 justify-content-between">
+            <h5 className="mb-1">Nova Funcionalidade 3</h5>
+            <small className="text-body-secondary">Em breve</small>
+          </div>
+          <p className="mb-1">Ajusta a Aba de Relatorios</p>
+          <small className="text-body-secondary">Mais detalhes em breve.</small>
+        </a>
         
       </ListGroup>
     </DashboardContainer>
