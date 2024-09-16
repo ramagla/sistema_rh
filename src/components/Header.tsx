@@ -6,8 +6,9 @@ const HeaderContainer = styled.header`
   display: flex;
   justify-content: space-between;
   padding: 20px;
-  background-color: #61dafb;
+  background-color: #004a8c; /* Azul mais escuro */
   color: white;
+  align-items: center; /* Alinha os itens ao centro verticalmente */
 `;
 
 const LogoutButton = styled.button`
@@ -26,7 +27,7 @@ const LogoutButton = styled.button`
 const Header: React.FC = () => {
   return (
     <HeaderContainer>
-      <h1>Sistema RH</h1>
+      <h1>Sistema de Envio de Holerites</h1>
       <Link to="/logout">
         <LogoutButton>Sair</LogoutButton>
       </Link>

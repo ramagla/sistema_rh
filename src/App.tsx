@@ -11,6 +11,7 @@ import LoginPage from './components/LoginPage';
 import PrivateRoute from './components/PrivateRoute';
 import Logout from './components/Logout';
 import Dashboard from './components/Dashboard';
+import { debug } from 'console';
 
 const AppContainer = styled.div`
   display: flex;
@@ -43,7 +44,6 @@ const App: React.FC = () => {
               <Route path="/extracao-arquivos" element={<PrivateRoute><ExtractionPage /></PrivateRoute>} />
               <Route path="/envio-holerites" element={<PrivateRoute><SendPage /></PrivateRoute>} />
               <Route path="/relatorios" element={<PrivateRoute><ReportPage /></PrivateRoute>} />
-              <Route path="/" element={<h2>Bem-vindo ao Sistema RH</h2>} />
               <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> {/* Definindo Dashboard como rota padrão */}
             </Routes>
           </MainContent>
@@ -53,4 +53,6 @@ const App: React.FC = () => {
   );
 };
 
+
 export default App;
+
