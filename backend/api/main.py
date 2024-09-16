@@ -352,6 +352,28 @@ def salvar_configuracoes():
     except Exception as e:
         return jsonify({"message": f"Erro ao salvar configurações: {str(e)}"}), 500
 
+import pdfplumber
+import re
+
+# Função para extrair o mês e ano do holerite a partir do PDF
+def extrair_mes_ano_holerite(caminho_pdf):
+    try:
+        with pdfplumber.open(caminho_pdf) as pdf:
+            for pagina in pdf.pages:
+                texto = pagina.extract_text()
+
+                # Regex para encontrar o mês e ano no holerite
+                padrao = re.search(r'Folha\s+Mensal\s+(Mensalista|Horista)\s+([A-Za-zçÇ]+)\s+de\s+(\d{4})', texto, re.DOTALL)
+                if padrao:
+                    tipo_funcionario = padrao.group(1)  # Mensalista ou Horista
+                    mes = padrao.group(2)
+                    ano = padrao.group(3)
+                    return f"{mes} de {ano} ({tipo_funcionario})"
+
+        return None
+    except Exception as e:
+        print(f"Erro ao extrair mês e ano do PDF {caminho_pdf}: {str(e)}")
+        return None
 
 
 # Rota para envio de holerites e registro de auditoria
@@ -362,7 +384,7 @@ def enviar_holerites():
     
     # Verificar se os arquivos foram enviados
     if 'zipfile' not in request.files or 'excelfile' not in request.files:
-        registrar_auditoria("Envio de Holerites", usuario, "Sucesso")
+        registrar_auditoria("Envio de Holerites", usuario, "Erro: Faltam arquivos")
         return jsonify({"message": "Ambos os arquivos são necessários."}), 400
 
     zip_file = request.files['zipfile']
@@ -382,11 +404,56 @@ def enviar_holerites():
             registrar_auditoria("Envio de Holerites", usuario, "Erro: Arquivo Excel inválido")
             return jsonify({"message": "Erro ao processar o arquivo Excel. Verifique se o arquivo contém os dados corretos."}), 400
 
-        print("Funcionários encontrados no Excel:", funcionarios)
-        processar_zip_e_enviar_emails(zip_file_path, funcionarios)
-        
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(UPLOAD_FOLDER)
+
+        # Iterar sobre os funcionários
+        for funcionario in funcionarios:
+            nome_funcionario = funcionario['name']
+            email_funcionario = funcionario['email']
+            pdf_file_path = os.path.join(UPLOAD_FOLDER, f"{nome_funcionario}.pdf")
+
+            if os.path.exists(pdf_file_path):
+                # Extrair a data de referência diretamente do PDF
+                data_referencia = extrair_mes_ano_holerite(pdf_file_path)
+                if not data_referencia:
+                    print(f"Não foi possível extrair a data de referência do holerite de {nome_funcionario}")
+                    continue  # Pula para o próximo funcionário se não conseguir extrair a data
+
+                assunto = f"Holerite referente a {data_referencia}"
+
+                # Corpo do e-mail em HTML personalizado
+                corpo_html = f"""
+                <html>
+                <body>
+                    <div style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+                        <h2 style="color: #6c757d;">Seu holerite está disponível</h2>
+                        <p>Olá, {nome_funcionario}!</p>
+                        <p>Seu holerite referente a <strong>{data_referencia}</strong> foi gerado com sucesso.</p>
+                        <p>O holerite está anexo neste e-mail.</p>
+                        <p style="color: #6c757d;">Obrigado,</p>
+                        <p><strong>Bras-Mol Molas e Estampados Ltda</strong></p>
+                    </div>
+                </body>
+                </html>
+                """
+
+                try:
+                    # Enviar e-mail com anexo e corpo em HTML
+                    enviar_email_com_anexo(email_funcionario, assunto, corpo_html, pdf_file_path)
+                    
+                    # Salvar sucesso no arquivo de texto
+                    salvar_relatorio_txt(nome_funcionario, email_funcionario, True)
+                    print(f"E-mail enviado para {email_funcionario} com o arquivo {pdf_file_path}")
+                except Exception as e:
+                    salvar_relatorio_txt(nome_funcionario, email_funcionario, False, str(e))
+                    print(f"Erro ao enviar e-mail para {email_funcionario}: {e}")
+            else:
+                print(f"Arquivo PDF não encontrado para {nome_funcionario}")
+
         # Registrar sucesso na auditoria
         registrar_auditoria("Envio de Holerites", usuario, "Sucesso")
+
     except Exception as e:
         registrar_auditoria("Envio de Holerites", usuario, f"Erro: {str(e)}")
         return jsonify({"message": f"Erro ao processar arquivos: {str(e)}"}), 500
@@ -397,7 +464,6 @@ def enviar_holerites():
 
     return jsonify({"message": "Holerites enviados com sucesso!"}), 200
 
-import re
 
 @app.route('/api/relatorios', methods=['GET'])
 @jwt_required()
