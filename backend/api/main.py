@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_file, make_response
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 from utils.email_utils import enviar_email_com_anexo
-import os
+from flask import jsonify
 from PyPDF2 import PdfReader, PdfWriter
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -14,6 +14,8 @@ import pdfplumber
 import re
 import pandas as pd
 import json
+import os
+
 
 
 app = Flask(__name__)
@@ -42,8 +44,11 @@ users_db = {
     "operador": {"password": "5678", "role": "operador"},
 }
 
+# Obtém o diretório base onde o script está sendo executado
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Caminho do arquivo de log para auditoria
-LOG_FILE_PATH = '../logs/auditoria.txt'
+LOG_FILE_PATH = os.path.join(BASE_DIR, 'logs', 'auditoria.txt')
 
 # Caminho para armazenar arquivos temporários
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
@@ -53,11 +58,16 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 # Função para gravar logs de auditoria no arquivo
 def registrar_auditoria(acao, usuario, resultado):
-    if not os.path.exists('../logs'):
-        os.makedirs('../logs')
+    if not os.path.exists(os.path.join(BASE_DIR, 'logs')):
+        os.makedirs(os.path.join(BASE_DIR, 'logs'))
+    
     with open(LOG_FILE_PATH, 'a') as log_file:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_file.write(f"{timestamp} - {usuario}: {acao} - Resultado: {resultado}\n")
+        # Salvando o log com dados diretos
+        log_file.write(f"{timestamp} - {usuario['username']} - {usuario.get('email', 'email@exemplo.com')} - {acao} - Resultado: {resultado}\n")
+
+
+
 
 # Função para enviar notificação por e-mail em caso de erro
 def enviar_email_notificacao(email_destinatario, motivo_erro):
@@ -344,10 +354,15 @@ def salvar_configuracoes():
 
 
 
+# Rota para envio de holerites e registro de auditoria
 @app.route('/api/enviar-holerites', methods=['POST'])
 @jwt_required()
 def enviar_holerites():
+    usuario = get_jwt_identity()  # Obtém o usuário autenticado
+    
+    # Verificar se os arquivos foram enviados
     if 'zipfile' not in request.files or 'excelfile' not in request.files:
+        registrar_auditoria("Envio de Holerites", usuario, "Sucesso")
         return jsonify({"message": "Ambos os arquivos são necessários."}), 400
 
     zip_file = request.files['zipfile']
@@ -364,11 +379,16 @@ def enviar_holerites():
     try:
         funcionarios = ler_excel(excel_file_path)
         if funcionarios is None:
+            registrar_auditoria("Envio de Holerites", usuario, "Erro: Arquivo Excel inválido")
             return jsonify({"message": "Erro ao processar o arquivo Excel. Verifique se o arquivo contém os dados corretos."}), 400
 
         print("Funcionários encontrados no Excel:", funcionarios)
         processar_zip_e_enviar_emails(zip_file_path, funcionarios)
+        
+        # Registrar sucesso na auditoria
+        registrar_auditoria("Envio de Holerites", usuario, "Sucesso")
     except Exception as e:
+        registrar_auditoria("Envio de Holerites", usuario, f"Erro: {str(e)}")
         return jsonify({"message": f"Erro ao processar arquivos: {str(e)}"}), 500
 
     # Limpar arquivos temporários
@@ -377,31 +397,40 @@ def enviar_holerites():
 
     return jsonify({"message": "Holerites enviados com sucesso!"}), 200
 
+import re
+
 @app.route('/api/relatorios', methods=['GET'])
 @jwt_required()
 def obter_relatorios():
-    log_file = os.path.join(UPLOAD_FOLDER, 'relatorios_envio.txt')
-    relatorios = []
+    try:
+        logs = []
+        if os.path.exists(LOG_FILE_PATH):
+            with open(LOG_FILE_PATH, 'r') as log_file:
+                for line in log_file:
+                    print(f"Processando linha do log: {line.strip()}")  # Log para verificar cada linha processada
+                    try:
+                        # Regex atualizado para capturar os campos do log corretamente
+                        match = re.match(r'^(.*?) - \{\'username\': \'(.*?)\', \'role\': \'(.*?)\'\}: (.*?) - Resultado: (.*)$', line.strip())
+                        if match:
+                            timestamp, username, role, acao, resultado = match.groups()
+                            print(f"Match encontrado: {match.groups()}")  # Verificação de match encontrado
+                            logs.append({
+                                'timestamp': timestamp,
+                                'nome': username,
+                                'email': f'{username}@exemplo.com',  # E-mail derivado do nome de usuário
+                                'status': resultado
+                            })
+                        else:
+                            print(f"Regex não bateu com a linha: {line.strip()}")
+                    except Exception as e:
+                        print(f"Erro ao processar linha do log: {line.strip()} - Erro: {str(e)}")
+        else:
+            print(f"Arquivo de log {LOG_FILE_PATH} não encontrado.")
+        print(f"Logs capturados: {logs}")
+        return jsonify(logs), 200
+    except Exception as e:
+        return jsonify({"message": f"Erro ao ler logs: {str(e)}"}), 500
 
-    if os.path.exists(log_file):
-        with open(log_file, 'r') as file:
-            for linha in file:
-                partes = linha.strip().split(" | ")
-                relatorios.append({
-                    "id": int(partes[0]),  # Certifique-se de adicionar um campo 'id'
-                    "nome": partes[1],
-                    "email": partes[2],
-                    "success": partes[3] == "Sucesso",  # Verifica se foi sucesso
-                    "errorReason": partes[4] if partes[3] == "Erro" else None,
-                    "timestamp": partes[5],
-                })
-
-    return jsonify(relatorios), 200
-
-
-
-    # Retornar sempre um array, mesmo que esteja vazio
-    return jsonify(relatorios), 200
 
    
 
@@ -418,6 +447,20 @@ def salvar_relatorio_txt(nome, email, success, error_reason=None):
     with open(log_file, 'a') as file:
         file.write(log_entry)
 
+
+# Rota para buscar logs de auditoria
+@app.route('/api/logs', methods=['GET'])
+@jwt_required()  # Certifique-se de que o usuário está autenticado
+def obter_logs():
+    try:
+        if os.path.exists(LOG_FILE_PATH):
+            with open(LOG_FILE_PATH, 'r') as log_file:
+                logs = log_file.readlines()  # Lê todas as linhas do arquivo de log
+            return jsonify(logs), 200  # Retorna os logs em formato JSON
+        else:
+            return jsonify([]), 200  # Retorna um array vazio se o arquivo não existir
+    except Exception as e:
+        return jsonify({"message": f"Erro ao ler logs: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
