@@ -381,6 +381,7 @@ def extrair_mes_ano_holerite(caminho_pdf):
 @jwt_required()
 def enviar_holerites():
     usuario = get_jwt_identity()  # Obtém o usuário autenticado
+    erros_envio = []  # Lista para armazenar logs de erro
     
     # Verificar se os arquivos foram enviados
     if 'zipfile' not in request.files or 'excelfile' not in request.files:
@@ -417,7 +418,7 @@ def enviar_holerites():
                 # Extrair a data de referência diretamente do PDF
                 data_referencia = extrair_mes_ano_holerite(pdf_file_path)
                 if not data_referencia:
-                    print(f"Não foi possível extrair a data de referência do holerite de {nome_funcionario}")
+                    erros_envio.append(f"Erro: Não foi possível extrair a data do holerite para {nome_funcionario}.")
                     continue  # Pula para o próximo funcionário se não conseguir extrair a data
 
                 assunto = f"Holerite referente a {data_referencia}"
@@ -441,28 +442,25 @@ def enviar_holerites():
                 try:
                     # Enviar e-mail com anexo e corpo em HTML
                     enviar_email_com_anexo(email_funcionario, assunto, corpo_html, pdf_file_path)
-                    
-                    # Salvar sucesso no arquivo de texto
                     salvar_relatorio_txt(nome_funcionario, email_funcionario, True)
                     print(f"E-mail enviado para {email_funcionario} com o arquivo {pdf_file_path}")
                 except Exception as e:
+                    erros_envio.append(f"Erro ao enviar e-mail para {nome_funcionario}: {str(e)}")
                     salvar_relatorio_txt(nome_funcionario, email_funcionario, False, str(e))
-                    print(f"Erro ao enviar e-mail para {email_funcionario}: {e}")
             else:
-                print(f"Arquivo PDF não encontrado para {nome_funcionario}")
+                erros_envio.append(f"Erro: Arquivo PDF não encontrado para {nome_funcionario}.")
 
-        # Registrar sucesso na auditoria
         registrar_auditoria("Envio de Holerites", usuario, "Sucesso")
-
     except Exception as e:
         registrar_auditoria("Envio de Holerites", usuario, f"Erro: {str(e)}")
-        return jsonify({"message": f"Erro ao processar arquivos: {str(e)}"}), 500
+        return jsonify({"message": f"Erro ao processar arquivos: {str(e)}", "errors": erros_envio}), 500
 
     # Limpar arquivos temporários
     os.remove(zip_file_path)
     os.remove(excel_file_path)
 
-    return jsonify({"message": "Holerites enviados com sucesso!"}), 200
+    return jsonify({"message": "Holerites enviados com sucesso!", "errors": erros_envio}), 200
+
 
 
 @app.route('/api/relatorios', methods=['GET'])
