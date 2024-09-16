@@ -528,6 +528,8 @@ def obter_logs():
 
 
 if __name__ == '__main__':
+    app.run()
+
 # Exibir todas as rotas registradas
     print("Rotas registradas no Flask:")
     for rule in app.url_map.iter_rules():
