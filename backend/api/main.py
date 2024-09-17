@@ -18,17 +18,7 @@ import os
 
 
 
-app = Flask(__name__, static_folder='build', static_url_path='/')
-
-
-# Rota para servir a aplicação frontend
-@app.route('/')
-def serve():
-    return send_from_directory(app.static_folder, 'index.html')
-
-@app.route('/<path:path>')
-def static_proxy(path):
-    return send_from_directory(app.static_folder, path)
+app = Flask(__name__)
 
 
 # Configuração correta do CORS para permitir requisições do frontend
@@ -112,14 +102,15 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    # Verifica se o usuário existe e se a senha está correta
+    # Simulação de banco de dados
     user = users_db.get(username)
     if not user or user['password'] != password:
         return jsonify({"message": "Usuário ou senha incorretos"}), 401
 
-    # Gera o token JWT
+    # Geração do token JWT
     access_token = create_access_token(identity={"username": username, "role": user['role']})
     return jsonify(access_token=access_token), 200
+
 
 
 # Função para dividir um PDF em várias páginas
