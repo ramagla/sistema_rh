@@ -21,7 +21,6 @@ import os
 app = Flask(__name__, static_folder='build', static_url_path='/')
 
 
-
 # Rota para servir a aplicação frontend
 @app.route('/')
 def serve():
