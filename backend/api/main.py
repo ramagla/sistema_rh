@@ -551,3 +551,6 @@ def obter_logs():
 
 if __name__ == '__main__':
   app.arguments(debug=True)
+
+for rule in app.url_map.iter_rules():
+   print(f"{rule} -> {rule.endpoint}")
