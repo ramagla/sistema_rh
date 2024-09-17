@@ -28,6 +28,7 @@ jobs:
         run: |                  
           npm install
           npm run build
+          cp -r build ../backend/api/build
 
       # Build do backend (Flask)
       - name: Install backend dependencies
