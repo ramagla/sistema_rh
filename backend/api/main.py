@@ -26,7 +26,6 @@ app = Flask(__name__, static_folder='build', static_url_path='/')
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
 
-# Rota para servir qualquer outro arquivo estático
 @app.route('/<path:path>')
 def static_proxy(path):
     return send_from_directory(app.static_folder, path)
