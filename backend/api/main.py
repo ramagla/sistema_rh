@@ -18,7 +18,8 @@ import os
 
 
 
-app = Flask(__name__, static_folder='../build', static_url_path='/')
+app = Flask(__name__, static_folder='build', static_url_path='/')
+
 
 
 # Rota para servir a aplicação frontend
@@ -539,18 +540,9 @@ def obter_logs():
     except Exception as e:
         return jsonify({"message": f"Erro ao ler logs: {str(e)}"}), 500
 
-
-# Exibir todas as rotas registradas
-    print("Rotas registradas no Flask:")
-    for rule in app.url_map.iter_rules():
-        print(f"{rule} -> {rule.endpoint}")
-
-    if not os.path.exists('../logs'):
-        os.makedirs('../logs')  # Garante que a pasta de logs exista
-    app.run(debug=True, host='0.0.0.0')
-
 if __name__ == '__main__':
-  app.arguments(debug=True)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(debug=True, host='0.0.0.0', port=port)
 
 for rule in app.url_map.iter_rules():
    print(f"{rule} -> {rule.endpoint}")
