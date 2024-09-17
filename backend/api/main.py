@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, make_response
+from flask import Flask, request, jsonify, send_file, make_response, send_from_directory
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 from utils.email_utils import enviar_email_com_anexo
@@ -18,7 +18,19 @@ import os
 
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../../build', static_url_path='/')
+
+
+# Rota para servir a aplicação frontend
+@app.route('/')
+def serve():
+    return send_from_directory(app.static_folder, 'index.html')
+
+# Rota para servir qualquer outro arquivo estático
+@app.route('/<path:path>')
+def static_proxy(path):
+    return send_from_directory(app.static_folder, path)
+
 
 # Configuração correta do CORS para permitir requisições do frontend
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
