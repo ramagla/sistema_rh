@@ -18,7 +18,7 @@ import os
 
 
 
-app = Flask(__name__, static_folder='../../build', static_url_path='/')
+app = Flask(__name__, static_folder='../build', static_url_path='/')
 
 
 # Rota para servir a aplicação frontend
@@ -33,7 +33,8 @@ def static_proxy(path):
 
 
 # Configuração correta do CORS para permitir requisições do frontend
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": "https://sistema-rh.azurewebsites.net"}}, supports_credentials=True)
+
 
 # Configuração da chave secreta para o JWT
 app.config['JWT_SECRET_KEY'] = 'sua_chave_secreta'
@@ -538,9 +539,6 @@ def obter_logs():
     except Exception as e:
         return jsonify({"message": f"Erro ao ler logs: {str(e)}"}), 500
 
-
-if __name__ == '__main__':
-    app.run()
 
 # Exibir todas as rotas registradas
     print("Rotas registradas no Flask:")
