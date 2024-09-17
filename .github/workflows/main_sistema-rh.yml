@@ -25,7 +25,8 @@ jobs:
 
       # Instalar dependências e build do frontend
       - name: Install and build frontend
-        run: |         
+        run: |
+          cd sistema-rh         
           npm install
           npm run build
 
