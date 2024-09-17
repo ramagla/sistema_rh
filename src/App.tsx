@@ -11,7 +11,7 @@ import LoginPage from './components/LoginPage';
 import PrivateRoute from './components/PrivateRoute';
 import Logout from './components/Logout';
 import Dashboard from './components/Dashboard';
-import { debug } from 'console';
+
 
 const AppContainer = styled.div`
   display: flex;

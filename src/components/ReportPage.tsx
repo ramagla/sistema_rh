@@ -54,30 +54,6 @@ const DateInput = styled.input`
   box-sizing: border-box; /* Inclui o padding e border na largura total */
 `;
 
-const ErrorTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-
-  th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
-  }
-
-  th {
-    background-color: #f8f9fa;
-  }
-`;
-
-const Result = styled.div<{ success: boolean }>`
-  margin-top: 10px;
-  padding: 10px;
-  background-color: ${(props) => (props.success ? '#d4edda' : '#f8d7da')};
-  border: 1px solid ${(props) => (props.success ? '#c3e6cb' : '#f5c6cb')};
-  color: ${(props) => (props.success ? '#155724' : '#721c24')};
-`;
-
 interface Report {
   timestamp: string;
   nome: string;
