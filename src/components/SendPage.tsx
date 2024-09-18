@@ -113,7 +113,7 @@ const SendPage: React.FC = () => {
   try {
     setLogs((prevLogs) => [...prevLogs, 'Iniciando o envio dos arquivos...']);
 
-    const response = await fetch('http://localhost:5000/api/enviar-holerites', {
+    const response = await fetch('https://ramagla.pythonanywhere.com/api/enviar-holerites', {
       method: 'POST',
       body: formData,
       headers: {
@@ -212,10 +212,12 @@ const SendPage: React.FC = () => {
         </button>
 
         {feedback && (
-          <FeedbackMessage success={feedback.success ? true : undefined}>
+          <FeedbackMessage success={Boolean(feedback.success)}>
             {feedback.message}
           </FeedbackMessage>
         )}
+
+
 
         <LogContainer>
           <h3>Logs do Processo:</h3>

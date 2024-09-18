@@ -72,7 +72,7 @@ const ExtractionPage: React.FC = () => {
 
     setLogs((prevLogs) => [...prevLogs, 'Iniciando o processamento do arquivo...']);
 
-    fetch('http://localhost:5000/api/dividir-renomear-zipar-pdf', {
+    fetch('https://ramagla.pythonanywhere.com/api/dividir-renomear-zipar-pdf', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,  // Envia o token JWT no cabeçalho
