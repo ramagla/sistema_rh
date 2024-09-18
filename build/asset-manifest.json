@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "./backend/api/build/static/css/main.d221dc40.css",
+    "main.js": "./backend/api/build/static/js/main.f8bf7ebe.js",
+    "static/media/Logo Bras-Mol-Model-Branco.png": "./backend/api/build/static/media/Logo Bras-Mol-Model-Branco.4f53aebe09284cea6200.png",
+    "index.html": "./backend/api/build/index.html",
+    "main.d221dc40.css.map": "./backend/api/build/static/css/main.d221dc40.css.map",
+    "main.f8bf7ebe.js.map": "./backend/api/build/static/js/main.f8bf7ebe.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d221dc40.css",
+    "static/js/main.f8bf7ebe.js"
+  ]
+}
