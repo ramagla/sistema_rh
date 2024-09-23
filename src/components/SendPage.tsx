@@ -117,8 +117,7 @@ const SendPage: React.FC = () => {
       method: 'POST',
       body: formData,
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Inclui o token JWT no cabeçalho
+        'Accept': 'application/json',        
       },
     });
 
