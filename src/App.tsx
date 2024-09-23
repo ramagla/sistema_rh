@@ -7,11 +7,7 @@ import ConfigPage from './components/ConfigPage';
 import ExtractionPage from './components/ExtractionPage';
 import SendPage from './components/SendPage';
 import ReportPage from './components/ReportPage';
-import LoginPage from './components/LoginPage';
-import PrivateRoute from './components/PrivateRoute';
-import Logout from './components/Logout';
 import Dashboard from './components/Dashboard';
-
 
 const AppContainer = styled.div`
   display: flex;
@@ -38,13 +34,11 @@ const App: React.FC = () => {
           <Header />
           <MainContent>
             <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/logout" element={<Logout />} />
-              <Route path="/configuracoes" element={<PrivateRoute><ConfigPage /></PrivateRoute>} />
-              <Route path="/extracao-arquivos" element={<PrivateRoute><ExtractionPage /></PrivateRoute>} />
-              <Route path="/envio-holerites" element={<PrivateRoute><SendPage /></PrivateRoute>} />
-              <Route path="/relatorios" element={<PrivateRoute><ReportPage /></PrivateRoute>} />
-              <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> {/* Definindo Dashboard como rota padrão */}
+              <Route path="/configuracoes" element={<ConfigPage />} />
+              <Route path="/extracao-arquivos" element={<ExtractionPage />} />
+              <Route path="/envio-holerites" element={<SendPage />} />
+              <Route path="/relatorios" element={<ReportPage />} />
+              <Route path="/" element={<Dashboard />} /> {/* Definindo Dashboard como rota padrão */}
             </Routes>
           </MainContent>
         </ContentContainer>
@@ -53,6 +47,4 @@ const App: React.FC = () => {
   );
 };
 
-
 export default App;
-
