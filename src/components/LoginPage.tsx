@@ -61,6 +61,7 @@ const LoginPage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Adicione esta linha para incluir as credenciais
         body: JSON.stringify({ username, password }),
       });
 
